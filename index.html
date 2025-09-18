@@ -77,153 +77,148 @@
   </div>
 
   <script>
-    const game = document.getElementById("game");
-    const player = document.getElementById("player");
-    const scoreDisplay = document.getElementById("score");
+  const game = document.getElementById("game");
+  const player = document.getElementById("player");
+  const scoreDisplay = document.getElementById("score");
 
-    let gravity = 0.5;
-    let velocity = 0;
-    let isGameOver = false;
-    let score = 0;
-    let pipeSpeed = 2; ]
+  let gravity = 0.5;
+  let velocity = 0;
+  let isGameOver = false;
+  let score = 0;
+  let pipeSpeed = 2; // fixed
 
-    let playerY = 200;
-    const jumpStrength = -8;
+  let playerY = 200;
+  const jumpStrength = -8;
 
-    document.addEventListener("keydown", function (e) {
-      if (e.code === "Space" && !isGameOver) {
-        velocity = jumpStrength;
-      } else if (isGameOver && e.code === "Enter") {
-        location.reload();
-      }
-    });
-document.addEventListener("touchstart", handleJump);
-document.addEventListener("mousedown", handleJump);
+  document.addEventListener("keydown", function (e) {
+    if (e.code === "Space" && !isGameOver) {
+      velocity = jumpStrength;
+    } else if (isGameOver && e.code === "Enter") {
+      location.reload();
+    }
+  });
 
-function handleJump(e) {
-  if (!isGameOver) {
-    velocity = jumpStrength;
-  } else {
+  // Mobile / mouse support
+  document.addEventListener("touchstart", handleJump);
+  document.addEventListener("mousedown", handleJump);
 
-    location.reload();
+  function handleJump(e) {
+    if (!isGameOver) {
+      velocity = jumpStrength;
+    } else {
+      location.reload();
+    }
   }
-}
 
-    function createPipe() {
-      const gapHeight = 150;
-      const pipeWidth = 60;
-      const pipeX = 400;
+  function createPipe() {
+    const gapHeight = 150;
+    const pipeX = 400;
 
-      const gapTop = Math.floor(Math.random() * 250) + 50;
+    const gapTop = Math.floor(Math.random() * 250) + 50;
 
-      const topPipe = document.createElement("div");
-      topPipe.classList.add("pipe");
-      topPipe.style.height = gapTop + "px";
-      topPipe.style.top = "0px";
-      topPipe.style.left = pipeX + "px";
+    const topPipe = document.createElement("div");
+    topPipe.classList.add("pipe");
+    topPipe.style.height = gapTop + "px";
+    topPipe.style.top = "0px";
+    topPipe.style.left = pipeX + "px";
 
-      const bottomPipe = document.createElement("div");
-      bottomPipe.classList.add("pipe");
-      bottomPipe.style.height = (600 - gapTop - gapHeight) + "px";
-      bottomPipe.style.top = (gapTop + gapHeight) + "px";
-      bottomPipe.style.left = pipeX + "px";
+    const bottomPipe = document.createElement("div");
+    bottomPipe.classList.add("pipe");
+    bottomPipe.style.height = (600 - gapTop - gapHeight) + "px";
+    bottomPipe.style.top = (gapTop + gapHeight) + "px";
+    bottomPipe.style.left = pipeX + "px";
 
-      game.appendChild(topPipe);
-      game.appendChild(bottomPipe);
+    game.appendChild(topPipe);
+    game.appendChild(bottomPipe);
 
-      movePipe(topPipe);
-      movePipe(bottomPipe);
-    }
+    movePipe(topPipe);
+    movePipe(bottomPipe);
+  }
 
-    function movePipe(pipe) {
-      let x = parseInt(pipe.style.left);
+  function movePipe(pipe) {
+    let x = parseInt(pipe.style.left);
 
-      const interval = setInterval(() => {
-        if (isGameOver) {
-          clearInterval(interval);
-          pipe.remove();
-          return;
-        }
-
-        x -= pipeSpeed; // dynamic speed
-        pipe.style.left = x + "px";
-
-        if (!pipe.passed && x + 60 < 80) {
-          pipe.passed = true;
-          score+;
-          scoreDisplay.innerText = "diddy blud aura rating: " + score;
-
-       
-          if (score % 5 === 0) {
-            pipeSpeed += 0.5;
-            pipeSpeed = Math.min(pipeSpeed, 50); 
-          }
-        }
-
-  
-        if (isColliding(player, pipe)) {
-          gameOver();
-        }
-
-        if (x < -60) {
-          pipe.remove();
-          clearInterval(interval);
-        }
-      }, 16);
-    }
-
-    function isColliding(a, b) {
-      const aRect = a.getBoundingClientRect();
-      const bRect = b.getBoundingClientRect();
-      return !(
-        aRect.bottom < bRect.top ||
-        aRect.top > bRect.bottom ||
-        aRect.right < bRect.left ||
-        aRect.left > bRect.right
-      );
-    }
-
-    function gameOver() {
-      isGameOver = true;
-      alert("you didnt mind the gap between the train and the platform: " + score + "\nPress Enter to restart.");
-    }
-
-    function gameLoop() {
-      if (isGameOver) return;
-
-      velocity += gravity;
-      playerY += velocity;
-
-      if (playerY + 30 > 600 || playerY < 0) {
-        gameOver();
+    const interval = setInterval(() => {
+      if (isGameOver) {
+        clearInterval(interval);
+        pipe.remove();
         return;
       }
 
-      player.style.top = playerY + "px";
+      x -= pipeSpeed; // dynamic speed
+      pipe.style.left = x + "px";
 
-      requestAnimationFrame(gameLoop);
-    }
+      if (!pipe.passed && x + 60 < 80) {
+        pipe.passed = true;
+        score++; // fixed increment
+        scoreDisplay.innerText = "diddy blud aura rating: " + score;
 
-    function startPipeSpawner() {
-      let spawnInterval = 2500; 
-
-      function spawn() {
-        if (isGameOver) return;
-
-        createPipe();
-
-      
-        spawnInterval = Math.max(800, 2500 - (pipeSpeed - 2) * 200);
-
-        setTimeout(spawn, spawnInterval);
+        if (score % 5 === 0) {
+          pipeSpeed += 0.5;
+          pipeSpeed = Math.min(pipeSpeed, 50);
+        }
       }
 
-      spawn();
+      if (isColliding(player, pipe)) {
+        gameOver();
+      }
+
+      if (x < -60) {
+        pipe.remove();
+        clearInterval(interval);
+      }
+    }, 16);
+  }
+
+  function isColliding(a, b) {
+    const aRect = a.getBoundingClientRect();
+    const bRect = b.getBoundingClientRect();
+    return !(
+      aRect.bottom < bRect.top ||
+      aRect.top > bRect.bottom ||
+      aRect.right < bRect.left ||
+      aRect.left > bRect.right
+    );
+  }
+
+  function gameOver() {
+    isGameOver = true;
+    alert("you didnt mind the gap between the train and the platform: " + score + "\nPress Enter or tap to restart.");
+  }
+
+  function gameLoop() {
+    if (isGameOver) return;
+
+    velocity += gravity;
+    playerY += velocity;
+
+    if (playerY + 30 > 600 || playerY < 0) {
+      gameOver();
+      return;
     }
 
-  
-    startPipeSpawner();
-    gameLoop();
-  </script>
+    player.style.top = playerY + "px";
+
+    requestAnimationFrame(gameLoop);
+  }
+
+  function startPipeSpawner() {
+    function spawn() {
+      if (isGameOver) return;
+
+      createPipe();
+
+      // New formula: faster pipes = shorter delay
+      let spawnInterval = Math.max(800, 2500 / (pipeSpeed / 2));
+
+      setTimeout(spawn, spawnInterval);
+    }
+
+    spawn();
+  }
+
+  startPipeSpawner();
+  gameLoop();
+</script>
 </body>
 </html>
