@@ -100,15 +100,13 @@
 
   // Mobile / mouse support
   document.addEventListener("touchstart", handleJump);
-  document.addEventListener("mousedown", handleJump);
-
-  function handleJump(e) {
-    if (!isGameOver) {
-      velocity = jumpStrength;
-    } else {
-      location.reload();
-    }
+function handleJump(e) {
+  if (!isGameOver) {
+    velocity = jumpStrength;
+  } else {
+    location.reload();
   }
+}
 
   function createPipe() {
     const gapHeight = 150;
